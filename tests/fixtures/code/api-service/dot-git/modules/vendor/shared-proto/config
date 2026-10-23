@@ -1,0 +1,8 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	worktree = ../../../../vendor/shared-proto
+[remote "origin"]
+	url = ssh://git@bitbucket.org/acme-demo/shared-proto.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

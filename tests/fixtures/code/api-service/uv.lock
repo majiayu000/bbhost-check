@@ -1,0 +1,7 @@
+version = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "acme-etl"
+version = "0.5.2"
+source = { git = "ssh://git@bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }

@@ -1,0 +1,20 @@
+image: node:22
+
+pipelines:
+  default:
+    - step:
+        name: Build
+        caches:
+          - node
+        script:
+          - mkdir -p ~/.ssh
+          - ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+          - git submodule update --init --recursive
+          - npm ci
+          - npm test
+  branches:
+    main:
+      - step:
+          name: Mirror to deploy repo
+          script:
+            - git push --mirror git@bitbucket.org:acme-demo/web-app-deploy.git

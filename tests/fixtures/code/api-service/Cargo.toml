@@ -1,0 +1,8 @@
+[package]
+name = "api-service"
+version = "0.7.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+acme-auth = { git = "ssh://git@bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }

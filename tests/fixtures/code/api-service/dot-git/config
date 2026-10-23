@@ -1,0 +1,10 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+[remote "origin"]
+	url = ssh://git@bitbucket.org/acme-demo/api-service.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[submodule "vendor/shared-proto"]
+	url = ssh://git@bitbucket.org/acme-demo/shared-proto.git
+	active = true

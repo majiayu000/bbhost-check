@@ -1,0 +1,10 @@
+stages: [test]
+
+test:
+  image: rust:1.90
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$BITBUCKET_SSH_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh && ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+  script:
+    - cargo test --locked

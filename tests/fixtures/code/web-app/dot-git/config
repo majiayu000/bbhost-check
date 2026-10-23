@@ -1,0 +1,23 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = git@bitbucket.org:acme-demo/web-app.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+	pushurl = git@bitbucket.org:acme-demo/web-app.git
+[remote "mirror"]
+	url = https://bitbucket.org/acme-demo/web-app.git
+	fetch = +refs/heads/*:refs/remotes/mirror/*
+[remote "deploy"]
+	url = ssh://git@bitbucket.org:22/acme-demo/web-app-deploy.git
+	fetch = +refs/heads/*:refs/remotes/deploy/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+[submodule "vendor/ui-kit"]
+	active = true
+	url = git@bitbucket.org:acme-demo/ui-kit.git

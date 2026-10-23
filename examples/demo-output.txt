@@ -1,0 +1,358 @@
+$ bbhost-check --root code
+code/api-service/.git/config  (repo git config)
+  9  -  url = ssh://git@bitbucket.org/acme-demo/api-service.git
+     +  url = ssh://git@ssh.bitbucket.org/acme-demo/api-service.git
+
+code/api-service/.gitlab-ci.yml  (CI config)
+  8  -  - mkdir -p ~/.ssh && ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+     +  - mkdir -p ~/.ssh && ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts
+
+code/api-service/Cargo.lock  (dependency)
+  8  -  source = "git+ssh://git@bitbucket.org/acme-demo/acme-auth.git?tag=v2.1.0#3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b"
+     +  source = "git+ssh://git@ssh.bitbucket.org/acme-demo/acme-auth.git?tag=v2.1.0#3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b"
+
+code/api-service/Cargo.toml  (dependency)
+  8  -  acme-auth = { git = "ssh://git@bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }
+     +  acme-auth = { git = "ssh://git@ssh.bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }
+
+code/api-service/Gemfile  (dependency)
+  4  -  gem "acme_billing", git: "git@bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"
+     +  gem "acme_billing", git: "git@ssh.bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"
+
+code/api-service/Gemfile.lock  (dependency)
+  2  -  remote: git@bitbucket.org:acme-demo/acme-billing.git
+     +  remote: git@ssh.bitbucket.org:acme-demo/acme-billing.git
+
+code/api-service/Jenkinsfile  (CI config)
+  6  -  git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@bitbucket.org:acme-demo/api-service.git'
+     +  git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@ssh.bitbucket.org:acme-demo/api-service.git'
+
+code/api-service/poetry.lock  (dependency)
+  12  -  url = "ssh://git@bitbucket.org/acme-demo/acme-etl.git"
+      +  url = "ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git"
+
+code/api-service/pyproject.toml  (dependency)
+  6  -  "acme-etl @ git+ssh://git@bitbucket.org/acme-demo/acme-etl.git@v0.5.2",
+     +  "acme-etl @ git+ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git@v0.5.2",
+
+code/api-service/requirements.txt  (dependency)
+  2  -  acme-etl @ git+ssh://git@bitbucket.org/acme-demo/acme-etl.git@v0.5.2
+     +  acme-etl @ git+ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git@v0.5.2
+
+code/api-service/uv.lock  (dependency)
+  7  -  source = { git = "ssh://git@bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }
+     +  source = { git = "ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }
+
+code/mirrors/legacy.git/config  (repo git config)
+  8  -  url = git@bitbucket.org:acme-demo/legacy.git
+     +  url = git@ssh.bitbucket.org:acme-demo/legacy.git
+
+code/web-app/.git/config  (repo git config)
+  9  -  url = git@bitbucket.org:acme-demo/web-app.git
+     +  url = git@ssh.bitbucket.org:acme-demo/web-app.git
+  11  -  pushurl = git@bitbucket.org:acme-demo/web-app.git
+      +  pushurl = git@ssh.bitbucket.org:acme-demo/web-app.git
+  16  -  url = ssh://git@bitbucket.org:22/acme-demo/web-app-deploy.git
+      +  url = ssh://git@ssh.bitbucket.org:22/acme-demo/web-app-deploy.git
+
+code/web-app/.github/workflows/deploy.yml  (CI config)
+  15  -  ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+      +  ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts
+  16  -  git clone --depth 1 git@bitbucket.org:acme-demo/shared-config.git config
+      +  git clone --depth 1 git@ssh.bitbucket.org:acme-demo/shared-config.git config
+
+code/web-app/.gitmodules  (.gitmodules)
+  3  -  url = git@bitbucket.org:acme-demo/ui-kit.git
+     +  url = git@ssh.bitbucket.org:acme-demo/ui-kit.git
+
+code/web-app/bitbucket-pipelines.yml  (CI config)
+  11  -  - ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+      +  - ssh-keyscan -t rsa ssh.bitbucket.org >> ~/.ssh/known_hosts
+  20  -  - git push --mirror git@bitbucket.org:acme-demo/web-app-deploy.git
+      +  - git push --mirror git@ssh.bitbucket.org:acme-demo/web-app-deploy.git
+
+code/web-app/package-lock.json  (dependency)
+  9  -  "resolved": "git+ssh://git@bitbucket.org/acme-demo/analytics.git#4f1c2a9d0b7e6f5a4c3b2a1908f7e6d5c4b3a291",
+     +  "resolved": "git+ssh://git@ssh.bitbucket.org/acme-demo/analytics.git#4f1c2a9d0b7e6f5a4c3b2a1908f7e6d5c4b3a291",
+  14  -  "resolved": "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
+      +  "resolved": "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
+
+code/web-app/package.json  (dependency)
+  6  -  "@acme-demo/ui-kit": "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0",
+     +  "@acme-demo/ui-kit": "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0",
+  7  !  "@acme-demo/analytics": "bitbucket:acme-demo/analytics#v0.9.1",
+        npm expands bitbucket: to git@bitbucket.org; use git+ssh://git@ssh.bitbucket.org/<workspace>/<repo>.git#<ref> and reinstall
+
+code/web-app/pnpm-lock.yaml  (dependency)
+  7  -  specifier: git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0
+     +  specifier: git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0
+  8  -  version: git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+     +  version: git+ssh://git@ssh.bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+  11  -  '@acme-demo/ui-kit@git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':
+      +  '@acme-demo/ui-kit@git+ssh://git@ssh.bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':
+  12  -  resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@bitbucket.org:acme-demo/ui-kit.git, type: git}
+      +  resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@ssh.bitbucket.org:acme-demo/ui-kit.git, type: git}
+
+code/web-app/yarn.lock  (dependency)
+  5  -  "@acme-demo/ui-kit@git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0":
+     +  "@acme-demo/ui-kit@git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0":
+  7  -  resolved "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b"
+     +  resolved "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b"
+
+$DEMO/home/.gitconfig  (global git config)
+  7  -  [url "git@bitbucket.org:"]
+     +  [url "git@ssh.bitbucket.org:"]
+
+$DEMO/home/.config/git/config  (global git config)
+  3  -  [url "ssh://git@bitbucket.org/acme-demo/"]
+     +  [url "ssh://git@ssh.bitbucket.org/acme-demo/"]
+
+$DEMO/home/.ssh/config  (ssh config)
+  5  -  Host bitbucket.org
+     +  Host bitbucket.org ssh.bitbucket.org
+        settings in this block stop applying once remotes use ssh.bitbucket.org
+  13  -  HostName bitbucket.org
+      +  HostName ssh.bitbucket.org
+         this alias connects to bitbucket.org over SSH
+
+$DEMO/home/.ssh/known_hosts  (known_hosts)
+  1  has  bitbucket.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEP/lDWBqLcxkQ9/as84K7SEi3IyNSyMNl3IkWMBsr81
+     +    ssh.bitbucket.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEP/lDWBqLcxkQ9/as84K7SEi3IyNSyMNl3IkWMBsr81
+     +    ssh.bitbucket.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPmc8GXqc06YM2yGdtuuQqY93ss1lmV6HPTKY2Kd/hOtU9Qrsc76ScvKNKDyMCYEKY+f5IXZDHchEmW2MhL3K48=
+        no entry for ssh.bitbucket.org; Bitbucket kept the same host keys
+
+35 finding(s) in 24 file(s), 28 file(s) scanned. 34 can be rewritten with --fix, 1 need a manual change.
+(exit 1)
+
+$ bbhost-check --root code --no-machine --format markdown
+### Bitbucket SSH host migration
+
+Bitbucket Cloud is moving Git over SSH from `bitbucket.org` to `ssh.bitbucket.org`; SSH to `bitbucket.org` is refused starting 2026-11-12 ([official announcement](https://community.atlassian.com/forums/Bitbucket-articles/Upcoming-change-to-Bitbucket-Cloud-SSH-access-move-from/ba-p/3234032)). HTTPS URLs are not affected.
+
+| Where | Kind | Now | Change to |
+|---|---|---|---|
+| `code/api-service/.git/config:9` | repo git config | `url = ssh://git@bitbucket.org/acme-demo/api-service.git` | `url = ssh://git@ssh.bitbucket.org/acme-demo/api-service.git` |
+| `code/api-service/.gitlab-ci.yml:8` | CI config | `- mkdir -p ~/.ssh && ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts` | `- mkdir -p ~/.ssh && ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts` |
+| `code/api-service/Cargo.lock:8` | dependency | `source = "git+ssh://git@bitbucket.org/acme-demo/acme-auth.git?tag=v2.1.0#3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b"` | `source = "git+ssh://git@ssh.bitbucket.org/acme-demo/acme-auth.git?tag=v2.1.0#3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b"` |
+| `code/api-service/Cargo.toml:8` | dependency | `acme-auth = { git = "ssh://git@bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }` | `acme-auth = { git = "ssh://git@ssh.bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }` |
+| `code/api-service/Gemfile:4` | dependency | `gem "acme_billing", git: "git@bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"` | `gem "acme_billing", git: "git@ssh.bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"` |
+| `code/api-service/Gemfile.lock:2` | dependency | `remote: git@bitbucket.org:acme-demo/acme-billing.git` | `remote: git@ssh.bitbucket.org:acme-demo/acme-billing.git` |
+| `code/api-service/Jenkinsfile:6` | CI config | `git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@bitbucket.org:acme-demo/api-service.git'` | `git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@ssh.bitbucket.org:acme-demo/api-service.git'` |
+| `code/api-service/poetry.lock:12` | dependency | `url = "ssh://git@bitbucket.org/acme-demo/acme-etl.git"` | `url = "ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git"` |
+| `code/api-service/pyproject.toml:6` | dependency | `"acme-etl @ git+ssh://git@bitbucket.org/acme-demo/acme-etl.git@v0.5.2",` | `"acme-etl @ git+ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git@v0.5.2",` |
+| `code/api-service/requirements.txt:2` | dependency | `acme-etl @ git+ssh://git@bitbucket.org/acme-demo/acme-etl.git@v0.5.2` | `acme-etl @ git+ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git@v0.5.2` |
+| `code/api-service/uv.lock:7` | dependency | `source = { git = "ssh://git@bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }` | `source = { git = "ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }` |
+| `code/mirrors/legacy.git/config:8` | repo git config | `url = git@bitbucket.org:acme-demo/legacy.git` | `url = git@ssh.bitbucket.org:acme-demo/legacy.git` |
+| `code/web-app/.git/config:9` | repo git config | `url = git@bitbucket.org:acme-demo/web-app.git` | `url = git@ssh.bitbucket.org:acme-demo/web-app.git` |
+| `code/web-app/.git/config:11` | repo git config | `pushurl = git@bitbucket.org:acme-demo/web-app.git` | `pushurl = git@ssh.bitbucket.org:acme-demo/web-app.git` |
+| `code/web-app/.git/config:16` | repo git config | `url = ssh://git@bitbucket.org:22/acme-demo/web-app-deploy.git` | `url = ssh://git@ssh.bitbucket.org:22/acme-demo/web-app-deploy.git` |
+| `code/web-app/.github/workflows/deploy.yml:15` | CI config | `ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts` | `ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts` |
+| `code/web-app/.github/workflows/deploy.yml:16` | CI config | `git clone --depth 1 git@bitbucket.org:acme-demo/shared-config.git config` | `git clone --depth 1 git@ssh.bitbucket.org:acme-demo/shared-config.git config` |
+| `code/web-app/.gitmodules:3` | .gitmodules | `url = git@bitbucket.org:acme-demo/ui-kit.git` | `url = git@ssh.bitbucket.org:acme-demo/ui-kit.git` |
+| `code/web-app/bitbucket-pipelines.yml:11` | CI config | `- ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts` | `- ssh-keyscan -t rsa ssh.bitbucket.org >> ~/.ssh/known_hosts` |
+| `code/web-app/bitbucket-pipelines.yml:20` | CI config | `- git push --mirror git@bitbucket.org:acme-demo/web-app-deploy.git` | `- git push --mirror git@ssh.bitbucket.org:acme-demo/web-app-deploy.git` |
+| `code/web-app/package-lock.json:9` | dependency | `"resolved": "git+ssh://git@bitbucket.org/acme-demo/analytics.git#4f1c2a9d0b7e6f5a4c3b2a1908f7e6d5c4b3a291",` | `"resolved": "git+ssh://git@ssh.bitbucket.org/acme-demo/analytics.git#4f1c2a9d0b7e6f5a4c3b2a1908f7e6d5c4b3a291",` |
+| `code/web-app/package-lock.json:14` | dependency | `"resolved": "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",` | `"resolved": "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",` |
+| `code/web-app/package.json:6` | dependency | `"@acme-demo/ui-kit": "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0",` | `"@acme-demo/ui-kit": "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0",` |
+| `code/web-app/package.json:7` | dependency | `"@acme-demo/analytics": "bitbucket:acme-demo/analytics#v0.9.1",` | manual: npm expands bitbucket: to git@bitbucket.org; use git+ssh://git@ssh.bitbucket.org/<workspace>/<repo>.git#<ref> and reinstall |
+| `code/web-app/pnpm-lock.yaml:7` | dependency | `specifier: git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0` | `specifier: git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0` |
+| `code/web-app/pnpm-lock.yaml:8` | dependency | `version: git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b` | `version: git+ssh://git@ssh.bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b` |
+| `code/web-app/pnpm-lock.yaml:11` | dependency | `'@acme-demo/ui-kit@git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':` | `'@acme-demo/ui-kit@git+ssh://git@ssh.bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':` |
+| `code/web-app/pnpm-lock.yaml:12` | dependency | `resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@bitbucket.org:acme-demo/ui-kit.git, type: git}` | `resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@ssh.bitbucket.org:acme-demo/ui-kit.git, type: git}` |
+| `code/web-app/yarn.lock:5` | dependency | `"@acme-demo/ui-kit@git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0":` | `"@acme-demo/ui-kit@git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0":` |
+| `code/web-app/yarn.lock:7` | dependency | `resolved "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b"` | `resolved "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b"` |
+
+30 finding(s) in 20 file(s), 24 file(s) scanned. 29 can be rewritten with --fix, 1 need a manual change.
+(exit 1)
+
+$ echo y | bbhost-check --root code --fix
+--- $DEMO/home/.config/git/config
++++ $DEMO/home/.config/git/config
+@@ line 3 @@
+-[url "ssh://git@bitbucket.org/acme-demo/"]
++[url "ssh://git@ssh.bitbucket.org/acme-demo/"]
+--- $DEMO/home/.gitconfig
++++ $DEMO/home/.gitconfig
+@@ line 7 @@
+-[url "git@bitbucket.org:"]
++[url "git@ssh.bitbucket.org:"]
+--- $DEMO/home/.ssh/config
++++ $DEMO/home/.ssh/config
+@@ line 5 @@
+-Host bitbucket.org
++Host bitbucket.org ssh.bitbucket.org
+@@ line 13 @@
+-  HostName bitbucket.org
++  HostName ssh.bitbucket.org
+--- $DEMO/home/.ssh/known_hosts
++++ $DEMO/home/.ssh/known_hosts
+@@ end of file @@
++ssh.bitbucket.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEP/lDWBqLcxkQ9/as84K7SEi3IyNSyMNl3IkWMBsr81
++ssh.bitbucket.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPmc8GXqc06YM2yGdtuuQqY93ss1lmV6HPTKY2Kd/hOtU9Qrsc76ScvKNKDyMCYEKY+f5IXZDHchEmW2MhL3K48=
+--- code/api-service/.git/config
++++ code/api-service/.git/config
+@@ line 9 @@
+-	url = ssh://git@bitbucket.org/acme-demo/api-service.git
++	url = ssh://git@ssh.bitbucket.org/acme-demo/api-service.git
+--- code/api-service/.gitlab-ci.yml
++++ code/api-service/.gitlab-ci.yml
+@@ line 8 @@
+-    - mkdir -p ~/.ssh && ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
++    - mkdir -p ~/.ssh && ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts
+--- code/api-service/Cargo.lock
++++ code/api-service/Cargo.lock
+@@ line 8 @@
+-source = "git+ssh://git@bitbucket.org/acme-demo/acme-auth.git?tag=v2.1.0#3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b"
++source = "git+ssh://git@ssh.bitbucket.org/acme-demo/acme-auth.git?tag=v2.1.0#3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b"
+--- code/api-service/Cargo.toml
++++ code/api-service/Cargo.toml
+@@ line 8 @@
+-acme-auth = { git = "ssh://git@bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }
++acme-auth = { git = "ssh://git@ssh.bitbucket.org/acme-demo/acme-auth.git", tag = "v2.1.0" }
+--- code/api-service/Gemfile
++++ code/api-service/Gemfile
+@@ line 4 @@
+-gem "acme_billing", git: "git@bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"
++gem "acme_billing", git: "git@ssh.bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"
+--- code/api-service/Gemfile.lock
++++ code/api-service/Gemfile.lock
+@@ line 2 @@
+-  remote: git@bitbucket.org:acme-demo/acme-billing.git
++  remote: git@ssh.bitbucket.org:acme-demo/acme-billing.git
+--- code/api-service/Jenkinsfile
++++ code/api-service/Jenkinsfile
+@@ line 6 @@
+-        git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@bitbucket.org:acme-demo/api-service.git'
++        git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@ssh.bitbucket.org:acme-demo/api-service.git'
+--- code/api-service/poetry.lock
++++ code/api-service/poetry.lock
+@@ line 12 @@
+-url = "ssh://git@bitbucket.org/acme-demo/acme-etl.git"
++url = "ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git"
+--- code/api-service/pyproject.toml
++++ code/api-service/pyproject.toml
+@@ line 6 @@
+-    "acme-etl @ git+ssh://git@bitbucket.org/acme-demo/acme-etl.git@v0.5.2",
++    "acme-etl @ git+ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git@v0.5.2",
+--- code/api-service/requirements.txt
++++ code/api-service/requirements.txt
+@@ line 2 @@
+-acme-etl @ git+ssh://git@bitbucket.org/acme-demo/acme-etl.git@v0.5.2
++acme-etl @ git+ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git@v0.5.2
+--- code/api-service/uv.lock
++++ code/api-service/uv.lock
+@@ line 7 @@
+-source = { git = "ssh://git@bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }
++source = { git = "ssh://git@ssh.bitbucket.org/acme-demo/acme-etl.git?tag=v0.5.2#5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c" }
+--- code/mirrors/legacy.git/config
++++ code/mirrors/legacy.git/config
+@@ line 8 @@
+-	url = git@bitbucket.org:acme-demo/legacy.git
++	url = git@ssh.bitbucket.org:acme-demo/legacy.git
+--- code/web-app/.git/config
++++ code/web-app/.git/config
+@@ line 9 @@
+-	url = git@bitbucket.org:acme-demo/web-app.git
++	url = git@ssh.bitbucket.org:acme-demo/web-app.git
+@@ line 11 @@
+-	pushurl = git@bitbucket.org:acme-demo/web-app.git
++	pushurl = git@ssh.bitbucket.org:acme-demo/web-app.git
+@@ line 16 @@
+-	url = ssh://git@bitbucket.org:22/acme-demo/web-app-deploy.git
++	url = ssh://git@ssh.bitbucket.org:22/acme-demo/web-app-deploy.git
+--- code/web-app/.github/workflows/deploy.yml
++++ code/web-app/.github/workflows/deploy.yml
+@@ line 15 @@
+-          ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
++          ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts
+@@ line 16 @@
+-          git clone --depth 1 git@bitbucket.org:acme-demo/shared-config.git config
++          git clone --depth 1 git@ssh.bitbucket.org:acme-demo/shared-config.git config
+--- code/web-app/.gitmodules
++++ code/web-app/.gitmodules
+@@ line 3 @@
+-	url = git@bitbucket.org:acme-demo/ui-kit.git
++	url = git@ssh.bitbucket.org:acme-demo/ui-kit.git
+--- code/web-app/bitbucket-pipelines.yml
++++ code/web-app/bitbucket-pipelines.yml
+@@ line 11 @@
+-          - ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
++          - ssh-keyscan -t rsa ssh.bitbucket.org >> ~/.ssh/known_hosts
+@@ line 20 @@
+-            - git push --mirror git@bitbucket.org:acme-demo/web-app-deploy.git
++            - git push --mirror git@ssh.bitbucket.org:acme-demo/web-app-deploy.git
+--- code/web-app/package-lock.json
++++ code/web-app/package-lock.json
+@@ line 9 @@
+-      "resolved": "git+ssh://git@bitbucket.org/acme-demo/analytics.git#4f1c2a9d0b7e6f5a4c3b2a1908f7e6d5c4b3a291",
++      "resolved": "git+ssh://git@ssh.bitbucket.org/acme-demo/analytics.git#4f1c2a9d0b7e6f5a4c3b2a1908f7e6d5c4b3a291",
+@@ line 14 @@
+-      "resolved": "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
++      "resolved": "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
+--- code/web-app/package.json
++++ code/web-app/package.json
+@@ line 6 @@
+-    "@acme-demo/ui-kit": "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0",
++    "@acme-demo/ui-kit": "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0",
+--- code/web-app/pnpm-lock.yaml
++++ code/web-app/pnpm-lock.yaml
+@@ line 7 @@
+-        specifier: git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0
++        specifier: git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0
+@@ line 8 @@
+-        version: git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
++        version: git+ssh://git@ssh.bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+@@ line 11 @@
+-  '@acme-demo/ui-kit@git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':
++  '@acme-demo/ui-kit@git+ssh://git@ssh.bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':
+@@ line 12 @@
+-    resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@bitbucket.org:acme-demo/ui-kit.git, type: git}
++    resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@ssh.bitbucket.org:acme-demo/ui-kit.git, type: git}
+--- code/web-app/yarn.lock
++++ code/web-app/yarn.lock
+@@ line 5 @@
+-"@acme-demo/ui-kit@git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0":
++"@acme-demo/ui-kit@git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#v3.2.0":
+@@ line 7 @@
+-  resolved "git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b"
++  resolved "git+ssh://git@ssh.bitbucket.org/acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b"
+Apply 34 change(s) to 24 file(s)? Backups are written next to each file. [y/N] wrote $DEMO/home/.config/git/config (backup: $DEMO/home/.config/git/config.bbhost-check-<unix-time>.bak)
+wrote $DEMO/home/.gitconfig (backup: $DEMO/home/.gitconfig.bbhost-check-<unix-time>.bak)
+wrote $DEMO/home/.ssh/config (backup: $DEMO/home/.ssh/config.bbhost-check-<unix-time>.bak)
+wrote $DEMO/home/.ssh/known_hosts (backup: $DEMO/home/.ssh/known_hosts.bbhost-check-<unix-time>.bak)
+wrote code/api-service/.git/config (backup: code/api-service/.git/config.bbhost-check-<unix-time>.bak)
+wrote code/api-service/.gitlab-ci.yml (backup: code/api-service/.gitlab-ci.yml.bbhost-check-<unix-time>.bak)
+wrote code/api-service/Cargo.lock (backup: code/api-service/Cargo.lock.bbhost-check-<unix-time>.bak)
+wrote code/api-service/Cargo.toml (backup: code/api-service/Cargo.toml.bbhost-check-<unix-time>.bak)
+wrote code/api-service/Gemfile (backup: code/api-service/Gemfile.bbhost-check-<unix-time>.bak)
+wrote code/api-service/Gemfile.lock (backup: code/api-service/Gemfile.lock.bbhost-check-<unix-time>.bak)
+wrote code/api-service/Jenkinsfile (backup: code/api-service/Jenkinsfile.bbhost-check-<unix-time>.bak)
+wrote code/api-service/poetry.lock (backup: code/api-service/poetry.lock.bbhost-check-<unix-time>.bak)
+wrote code/api-service/pyproject.toml (backup: code/api-service/pyproject.toml.bbhost-check-<unix-time>.bak)
+wrote code/api-service/requirements.txt (backup: code/api-service/requirements.txt.bbhost-check-<unix-time>.bak)
+wrote code/api-service/uv.lock (backup: code/api-service/uv.lock.bbhost-check-<unix-time>.bak)
+wrote code/mirrors/legacy.git/config (backup: code/mirrors/legacy.git/config.bbhost-check-<unix-time>.bak)
+wrote code/web-app/.git/config (backup: code/web-app/.git/config.bbhost-check-<unix-time>.bak)
+wrote code/web-app/.github/workflows/deploy.yml (backup: code/web-app/.github/workflows/deploy.yml.bbhost-check-<unix-time>.bak)
+wrote code/web-app/.gitmodules (backup: code/web-app/.gitmodules.bbhost-check-<unix-time>.bak)
+wrote code/web-app/bitbucket-pipelines.yml (backup: code/web-app/bitbucket-pipelines.yml.bbhost-check-<unix-time>.bak)
+wrote code/web-app/package-lock.json (backup: code/web-app/package-lock.json.bbhost-check-<unix-time>.bak)
+wrote code/web-app/package.json (backup: code/web-app/package.json.bbhost-check-<unix-time>.bak)
+wrote code/web-app/pnpm-lock.yaml (backup: code/web-app/pnpm-lock.yaml.bbhost-check-<unix-time>.bak)
+wrote code/web-app/yarn.lock (backup: code/web-app/yarn.lock.bbhost-check-<unix-time>.bak)
+
+After --fix:
+code/web-app/package.json  (dependency)
+  7  !  "@acme-demo/analytics": "bitbucket:acme-demo/analytics#v0.9.1",
+        npm expands bitbucket: to git@bitbucket.org; use git+ssh://git@ssh.bitbucket.org/<workspace>/<repo>.git#<ref> and reinstall
+
+1 finding(s) in 1 file(s), 28 file(s) scanned. 0 can be rewritten with --fix, 1 need a manual change.
+(exit 1)
+
+$ git -C code/web-app remote -v
+deploy	ssh://git@ssh.bitbucket.org:22/acme-demo/web-app-deploy.git (fetch)
+deploy	ssh://git@ssh.bitbucket.org:22/acme-demo/web-app-deploy.git (push)
+mirror	git@ssh.bitbucket.org:acme-demo/web-app.git (fetch)
+mirror	ssh://git@ssh.bitbucket.org/acme-demo/web-app.git (push)
+origin	git@ssh.bitbucket.org:acme-demo/web-app.git (fetch)
+origin	git@ssh.bitbucket.org:acme-demo/web-app.git (push)

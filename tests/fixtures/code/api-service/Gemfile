@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.0"
+gem "acme_billing", git: "git@bitbucket.org:acme-demo/acme-billing.git", tag: "v1.3.0"

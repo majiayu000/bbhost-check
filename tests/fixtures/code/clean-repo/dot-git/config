@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	bare = false
+[remote "origin"]
+	url = git@ssh.bitbucket.org:acme-demo/clean-repo.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "https"]
+	url = https://jdoe@bitbucket.org/acme-demo/clean-repo.git
+	fetch = +refs/heads/*:refs/remotes/https/*
+[url "git@ssh.bitbucket.org:"]
+	insteadOf = git@bitbucket.org:

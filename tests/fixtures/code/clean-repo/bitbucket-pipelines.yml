@@ -1,0 +1,8 @@
+pipelines:
+  default:
+    - step:
+        script:
+          - ssh-keyscan ssh.bitbucket.org >> ~/.ssh/known_hosts
+          - git clone git@ssh.bitbucket.org:acme-demo/tools.git
+          - git clone ssh://git@altssh.bitbucket.org:443/acme-demo/tools.git tools-443
+          - curl -fsSL https://bitbucket.org/site/ssh

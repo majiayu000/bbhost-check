@@ -1,0 +1,15 @@
+pipeline {
+  agent any
+  stages {
+    stage('Checkout') {
+      steps {
+        git branch: 'main', credentialsId: 'bitbucket-ssh', url: 'git@bitbucket.org:acme-demo/api-service.git'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'cargo test --locked'
+      }
+    }
+  }
+}

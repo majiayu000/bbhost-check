@@ -1,0 +1,13 @@
+lockfileVersion: '9.0'
+
+importers:
+  .:
+    dependencies:
+      '@acme-demo/ui-kit':
+        specifier: git+ssh://git@bitbucket.org/acme-demo/ui-kit.git#v3.2.0
+        version: git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+
+packages:
+  '@acme-demo/ui-kit@git+ssh://git@bitbucket.org:acme-demo/ui-kit.git#9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b':
+    resolution: {commit: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b, repo: git@bitbucket.org:acme-demo/ui-kit.git, type: git}
+    version: 3.2.0

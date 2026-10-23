@@ -1,0 +1,6 @@
+[submodule "vendor/ui-kit"]
+	path = vendor/ui-kit
+	url = git@bitbucket.org:acme-demo/ui-kit.git
+[submodule "vendor/icons"]
+	path = vendor/icons
+	url = https://bitbucket.org/acme-demo/icons.git

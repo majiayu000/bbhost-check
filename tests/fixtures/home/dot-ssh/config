@@ -1,0 +1,19 @@
+Host github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+
+Host bitbucket.org
+  User git
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/bitbucket_work
+  IdentitiesOnly yes
+
+# second Bitbucket account
+Host bitbucket.org-personal
+  HostName bitbucket.org
+  User git
+  IdentityFile ~/.ssh/bitbucket_personal
+  IdentitiesOnly yes
+
+Host *
+  ServerAliveInterval 60

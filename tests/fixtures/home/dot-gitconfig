@@ -1,0 +1,8 @@
+[user]
+	name = Demo User
+	email = demo@example.test
+[init]
+	defaultBranch = main
+# Go private modules over SSH (GOPRIVATE=bitbucket.org/acme-demo)
+[url "git@bitbucket.org:"]
+	insteadOf = https://bitbucket.org/
