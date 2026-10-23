@@ -14,7 +14,8 @@
 
 ## 需要用户决定
 
-- README 要不要写 12-10 这个最终移除日期。本轮已经在公告正文（10-21 更新）里读到 “Dec 10, 2026 Final removal”，但任务说明要求不写；README 目前只写 “11-12 起开始拒绝，之后按公告的 brownout 安排到最终移除”。
+（已定：README 写明 12-10 最终移除，出处为公告 10-21 更新。）
+
 - 是否在 v0.1.0 加 GitHub Action / Bitbucket Pipe（目前没做，`--format markdown` 和退出码 1 已经能在 CI 里用）。
 - 是否扩到 Dockerfile、Terraform、Ansible（设计里列为已知限制）。
 - crates.io 是否发布。
