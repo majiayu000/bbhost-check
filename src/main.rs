@@ -1,5 +1,6 @@
 mod discover;
 mod fix;
+mod gcm;
 mod knownhosts;
 mod report;
 mod rules;
@@ -25,7 +26,7 @@ struct Cli {
     #[arg(long, value_name = "DIR")]
     root: Vec<PathBuf>,
 
-    /// Skip ~/.ssh/config, ~/.ssh/known_hosts and the global/system git config
+    /// Skip ~/.ssh/config, ~/.ssh/known_hosts, the global/system git config and the GCM version check
     #[arg(long)]
     no_machine: bool,
 
@@ -74,6 +75,13 @@ fn collect_targets(cli: &Cli) -> Result<(Vec<Target>, Vec<String>), String> {
 fn scan(cli: &Cli) -> Result<Report, String> {
     let (targets, mut warnings) = collect_targets(cli)?;
     let mut report = scan::scan_targets(&targets);
+    if !cli.no_machine {
+        match gcm::check(report.https_bitbucket) {
+            Ok(Some(finding)) => report.findings.push(finding),
+            Ok(None) => {}
+            Err(w) => warnings.push(w),
+        }
+    }
     warnings.append(&mut report.warnings);
     report.warnings = warnings;
     Ok(report)

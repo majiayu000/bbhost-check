@@ -29,7 +29,7 @@ pub fn is_insteadof_to_new_host(section_url: &str, line: &str) -> bool {
             .is_some_and(|(_, value)| rewrite_ssh_urls(value.trim()).is_some())
 }
 
-fn is_insteadof(trimmed: &str) -> bool {
+pub fn is_insteadof(trimmed: &str) -> bool {
     let key = trimmed
         .split(|c: char| c == '=' || c.is_whitespace())
         .next()
@@ -92,15 +92,33 @@ fn is_ssh_scheme(scheme: &str) -> bool {
         .any(|s| scheme.eq_ignore_ascii_case(s))
 }
 
-fn is_ssh_host_at(line: &str, i: usize) -> bool {
+/// The URL-ish token that ends right before byte `i`.
+fn token_before(line: &str, i: usize) -> &str {
     let before = &line[..i];
-    let next = line[i + OLD_HOST.len()..].chars().next();
     let start = before
         .char_indices()
         .rev()
         .find(|&(_, c)| c.is_whitespace() || "\"'`=<>()[]{},".contains(c))
         .map_or(0, |(p, c)| p + c.len_utf8());
-    let token = &before[start..];
+    &before[start..]
+}
+
+/// `true` if the line has an HTTPS URL for `bitbucket.org` (where a credential helper is used).
+pub fn has_https_bitbucket(line: &str) -> bool {
+    line.match_indices(OLD_HOST).any(|(i, _)| {
+        let token = token_before(line, i).to_ascii_lowercase();
+        let next = line[i + OLD_HOST.len()..].chars().next();
+        (token.ends_with("//") || token.ends_with('@'))
+            && ["https://", "http://", "git+https://"]
+                .iter()
+                .any(|s| token.starts_with(s))
+            && next.is_none_or(|c| !is_host_char(c))
+    })
+}
+
+fn is_ssh_host_at(line: &str, i: usize) -> bool {
+    let next = line[i + OLD_HOST.len()..].chars().next();
+    let token = token_before(line, i);
 
     if let Some(rest) = token.strip_suffix('@') {
         match rest.find("://") {
@@ -230,6 +248,26 @@ mod tests {
                 .unwrap(),
             "ssh-keyscan ssh.bitbucket.org && git clone git@ssh.bitbucket.org:a/b.git"
         );
+    }
+
+    #[test]
+    fn https_bitbucket() {
+        assert!(has_https_bitbucket(
+            "\turl = https://bitbucket.org/acme/app.git"
+        ));
+        assert!(has_https_bitbucket(
+            "url = https://jdoe@bitbucket.org/acme/app.git"
+        ));
+        assert!(has_https_bitbucket(
+            r#""dep": "git+https://bitbucket.org/acme/lib.git""#
+        ));
+        assert!(!has_https_bitbucket("url = git@bitbucket.org:acme/app.git"));
+        assert!(!has_https_bitbucket(
+            "url = https://ssh.bitbucket.org/acme/app.git"
+        ));
+        assert!(!has_https_bitbucket(
+            "url = https://bitbucket.org.example.com/a"
+        ));
     }
 
     #[test]

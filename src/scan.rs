@@ -20,11 +20,13 @@ pub enum Kind {
     KnownHosts,
     Ci,
     Dependency,
+    CredentialHelper,
 }
 
 impl Kind {
     pub fn label(self) -> &'static str {
         match self {
+            Kind::CredentialHelper => "credential helper",
             Kind::RepoGitConfig => "repo git config",
             Kind::GitModules => ".gitmodules",
             Kind::GlobalGitConfig => "global git config",
@@ -68,6 +70,9 @@ pub struct Report {
     pub notes: Vec<String>,
     /// Files or directories that could not be checked.
     pub warnings: Vec<String>,
+    /// Some scanned git config, `.gitmodules` or dependency file reaches bitbucket.org over HTTPS.
+    #[serde(skip)]
+    pub https_bitbucket: bool,
 }
 
 impl Report {
@@ -103,7 +108,7 @@ pub fn scan_targets(targets: &[Target]) -> Report {
     let mut report = Report::default();
     let mut insteadof = false;
     for target in targets {
-        match scan_file(target, &mut insteadof) {
+        match scan_file(target, &mut insteadof, &mut report.https_bitbucket) {
             Ok(mut findings) => {
                 report.files_scanned += 1;
                 report.findings.append(&mut findings);
@@ -124,7 +129,7 @@ pub fn scan_targets(targets: &[Target]) -> Report {
     report
 }
 
-fn scan_file(target: &Target, insteadof: &mut bool) -> io::Result<Vec<Finding>> {
+fn scan_file(target: &Target, insteadof: &mut bool, https: &mut bool) -> io::Result<Vec<Finding>> {
     let path = &target.path;
     let finding = |line: usize, old: &str, new: Option<String>, action, note| Finding {
         kind: target.kind,
@@ -168,6 +173,13 @@ fn scan_file(target: &Target, insteadof: &mut bool) -> io::Result<Vec<Finding>> 
     let mut section_url = "";
     let mut out = Vec::new();
     for (idx, line) in lines.iter().enumerate() {
+        // `insteadOf = https://bitbucket.org/` sends HTTPS URLs over SSH, so it is not HTTPS use.
+        if target.kind != Kind::Ci
+            && !(is_gitconfig && rules::is_insteadof(line.trim_start()))
+            && rules::has_https_bitbucket(line)
+        {
+            *https = true;
+        }
         let new = if is_gitconfig {
             let trimmed = line.trim_start();
             if trimmed.starts_with('[') {

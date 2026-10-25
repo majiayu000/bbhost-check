@@ -96,6 +96,21 @@ URL 规则，外加一条：`insteadOf` / `pushInsteadOf` 这一行的值是“�
 
 `"bitbucket:ws/repo"` 只报不改：npm 解析 SSH 时会展开成旧主机名，需要用户自己改成 `git+ssh://git@ssh.bitbucket.org/ws/repo.git#tag`，并重新生成 lockfile。
 
+### GCM 版本检查（机器级，`--no-machine` 关闭）
+
+依据 Bitbucket Cloud changelog 2026-10-13：11-30 起，经 GCM 3.0.0 以下版本、用 OAuth 2.0 认证的 Git 请求会被拦截；GCM 配 PAT / app password 的不受影响。
+
+只在同时满足下面四条时报一条（类别 `credential helper`，只报不改）：
+
+1. 扫描到的仓库配置、`.gitmodules`、gitconfig 或依赖文件里有 `https://bitbucket.org`（`insteadOf = https://bitbucket.org/` 这一行是把 HTTPS 改走 SSH，不算）。
+2. 用 `git config --show-origin --get-regexp '^credential\..*helper$'` 按 git 的规则拼出访问 `https://bitbucket.org` 时的 helper 列表：通用的 `credential.helper` 和 `credential.<url>.helper`（url 的主机是 bitbucket.org）按配置顺序排列，空值清空前面的。列表里有 GCM（`manager`、`manager-core`，或以 `git-credential-manager[-core][.exe]` 结尾的路径）。
+3. `GCM_BITBUCKET_AUTHMODES`（优先）或 `credential.bitbucketAuthModes` 没设，或包含 `oauth`。
+4. 按 git 启动 helper 的方式取版本：裸名字 `x` 跑 `git credential-x --version`，路径直接跑 `<路径> --version`。输出里第一个 `X.Y.Z` 低于 3.0.0。
+
+找不到 GCM（命令不存在、`is not a git command`）当作没装，不报。GCM 在但读不出版本，作为警告输出，退出码 2。只调 `git config` 和 `--version`，不碰 `get`/`store`，不读凭据。
+
+提示里的升级办法按编译平台给出；Windows 要写明 Git for Windows 2.56.0.windows.3 仍捆绑 GCM 2.9.x（git-for-windows/git#6464 截至 10-25 仍 open），需要单独安装 GCM 3.0.1+。
+
 ## 输出
 
 - `text`：按文件分组，每条命中给出类别、`路径:行号`、`-` 原行、`+` 新行；最后一行汇总（命中数、可自动修复数、文件数）。
@@ -123,6 +138,7 @@ src/discover.rs  找文件、判断类别
 src/rules.rs     URL / gitconfig / ssh-keyscan / npm 简写规则
 src/sshconfig.rs ssh config 分段规则
 src/knownhosts.rs
+src/gcm.rs       GCM 版本检查
 src/report.rs    text / json / markdown
 src/fix.rs       预览、确认、备份、写入
 ```
@@ -131,6 +147,7 @@ src/fix.rs       预览、确认、备份、写入
 
 ## 已知限制
 
+- GCM 检查分不清用户实际选的是 OAuth 还是 app password（除非 `bitbucketAuthModes` 写明），也只按全局配置判断一次，不逐个仓库算 helper。
 - 不跟进 ssh config 的 `Include`，不解析 `Match` 段。
 - scp 写法必须带用户名（`git@...`）；`bitbucket.org:ws/repo` 这种省略用户名、靠 ssh config 补 `User` 的写法不报。
 - 不扫 Dockerfile、Terraform、Ansible 等（第一版范围外）；可用 `--format json` 的结果配合 `grep` 自查。

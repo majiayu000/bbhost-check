@@ -81,3 +81,22 @@ https://community.atlassian.com/forums/Bitbucket-articles/Upcoming-change-to-Bit
 3. `insteadOf = git@bitbucket.org:` 这一行本身就是解决方案，不能当成命中，否则会把用户的修复改坏。
 4. 匹配必须区分 HTTPS：`https://x@bitbucket.org/` 不能动。
 5. known_hosts 不联网、不硬编码公钥：主机密钥不变，直接复用本机已信任的 `bitbucket.org` 公钥，给 `ssh.bitbucket.org` 追加一份。
+
+## 6. 补充（2026-10-25）：GCM 3.0.0 截止日
+
+来源：Bitbucket Cloud changelog，2026-10-13 “Deprecation Notice: Git Credential Manager (GCM) upgrade required for continued OAuth 2.0 Git authentication”（https://developer.atlassian.com/cloud/bitbucket/changelog/ ，本轮直接抓取页面核对）。
+
+- 2026-11-30 起，经 GCM 认证、用 OAuth 2.0 的 Git 请求，GCM 版本低于 3.0.0 的会被拦截。原因是 Bitbucket 开始强制轮换 OAuth refresh token，Atlassian 给 GCM 贡献的支持进了 v3.0.0。
+- 不用 GCM，或 GCM 配的是 personal access token（app password / API token），不需要动作。
+- 升级前每次 `git push` 后会看到提示。
+- Git for Windows 用户：GCM 随 Git for Windows 捆绑，目前没有捆绑 3.x 的版本，官方让先单独安装 GCM。
+
+核对（gh api，2026-10-25）：
+- GCM releases：v3.0.0（2026-09-24）、v3.0.1（2026-10-06）；前一版 v2.9.1（2026-07-14）。
+- Git for Windows 最新 release：v2.56.0.windows.3（2026-10-22）。
+- [git-for-windows/git#6464](https://github.com/git-for-windows/git/issues/6464) “[New git-credential-manager version] GCM 3.0.1”：open，最后更新 10-19。
+- `git credential-manager --version` 的输出格式：GCM 用 `AssemblyInformationalVersion`，形如 `2.0.8-beta+e1f8492d04`（官方 issue 模板的示例），即 `X.Y.Z[-pre][+commit]`。
+- GCM 配置 `credential.bitbucketAuthModes` / `GCM_BITBUCKET_AUTHMODES`：可选 `oauth`、`basic`，不设则自动检测。只设 `basic` 时不会走 OAuth。
+- 各平台安装/升级：macOS `brew upgrade --cask git-credential-manager` 或 pkg；Linux `dotnet tool update -g git-credential-manager` 或 deb/tarball；Windows 独立安装包 `gcmuser-win-*`（当前用户，免管理员）和 `gcm-win-*`（全体用户），GCM 文档提示独立安装会覆盖 Git for Windows 自带的 GCM。
+
+本机（macOS）实况：没装 GCM，`credential.helper` 是系统 gitconfig 的 `osxkeychain`，github.com 走 `gh auth git-credential`，所以本机不会报。

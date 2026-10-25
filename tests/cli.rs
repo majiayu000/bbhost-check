@@ -286,3 +286,70 @@ fn markdown_and_clean_tree() {
     );
     assert!(String::from_utf8_lossy(&out.stdout).starts_with("No SSH use of bitbucket.org"));
 }
+
+/// A fake `git-credential-manager` that only answers `--version`.
+#[cfg(unix)]
+fn fake_gcm(dir: &Path, version: &str) -> PathBuf {
+    use std::os::unix::fs::PermissionsExt;
+    let path = dir.join(format!("gcm-{version}/git-credential-manager"));
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    fs::write(&path, format!("#!/bin/sh\necho '{version}+0a1b2c3d4e'\n")).unwrap();
+    fs::set_permissions(&path, fs::Permissions::from_mode(0o755)).unwrap();
+    path
+}
+
+#[cfg(unix)]
+fn gcm_findings(dir: &Path) -> Vec<Value> {
+    let out = run(dir, &["--format", "json"], "");
+    let json: Value = serde_json::from_slice(&out.stdout).unwrap();
+    json["findings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|f| f["kind"] == "credential-helper")
+        .cloned()
+        .collect()
+}
+
+#[cfg(unix)]
+#[test]
+fn gcm_below_3_is_reported_only_when_used_for_bitbucket_https() {
+    let dir = sandbox();
+    let gitconfig = dir.path().join("home/.gitconfig");
+    let base = fs::read_to_string(&gitconfig).unwrap();
+    let set_helper = |helper: &Path| {
+        fs::write(
+            &gitconfig,
+            format!("{base}[credential]\n\thelper = {}\n", helper.display()),
+        )
+        .unwrap();
+    };
+
+    let old = fake_gcm(dir.path(), "2.9.1");
+    set_helper(&old);
+    let found = gcm_findings(dir.path());
+    assert_eq!(found.len(), 1, "{found:#?}");
+    assert_eq!(found[0]["line"], 10);
+    assert!(found[0]["old"].as_str().unwrap().contains("(GCM 2.9.1)"));
+    assert_eq!(found[0]["action"], "manual");
+
+    // basic auth only: OAuth blocking does not apply
+    fs::write(
+        &gitconfig,
+        format!(
+            "{base}[credential]\n\thelper = {}\n\tbitbucketAuthModes = basic\n",
+            old.display()
+        ),
+    )
+    .unwrap();
+    assert!(gcm_findings(dir.path()).is_empty());
+
+    set_helper(&fake_gcm(dir.path(), "3.0.1"));
+    assert!(gcm_findings(dir.path()).is_empty());
+
+    // no HTTPS use of bitbucket.org anywhere in the scanned tree
+    set_helper(&old);
+    fs::remove_dir_all(dir.path().join("code")).unwrap();
+    fs::create_dir(dir.path().join("code")).unwrap();
+    assert!(gcm_findings(dir.path()).is_empty());
+}

@@ -4,6 +4,8 @@
 
 Per the [official Atlassian announcement](https://community.atlassian.com/forums/Bitbucket-articles/Upcoming-change-to-Bitbucket-Cloud-SSH-access-move-from/ba-p/3234032), Bitbucket Cloud is splitting traffic: `bitbucket.org` keeps HTTPS (web, API, `https://` clones) and all Git over SSH moves to `ssh.bitbucket.org`. Starting **2026-11-12**, SSH to `bitbucket.org` is blocked during scheduled brownout windows on working days, growing from 15 minutes to 3 hours, and on **2026-12-10** it is removed for good (per the announcement's October 21, 2026 update). The host keys stay the same. HTTPS URLs are not affected.
 
+A second Bitbucket deadline is covered too: per the [Bitbucket Cloud changelog (2026-10-13)](https://developer.atlassian.com/cloud/bitbucket/changelog/), from **2026-11-30** Git requests authenticated with OAuth 2.0 through **Git Credential Manager (GCM) older than 3.0.0** are blocked. `bbhost-check` reports an old GCM when it is the credential helper git would use for `https://bitbucket.org` and something on the machine actually reaches Bitbucket over HTTPS. See [GCM check](#gcm-check-2026-11-30).
+
 `bbhost-check` is read-only unless you pass `--fix`. It only touches local files, needs no Bitbucket token, and never changes `https://` URLs.
 
 ## Install
@@ -37,12 +39,12 @@ bbhost-check --root . --no-machine --format markdown
 | Flag | What it does |
 |---|---|
 | `--root DIR` | Directory to scan recursively; repeatable. Default `.` |
-| `--no-machine` | Skip `~/.ssh/config`, `~/.ssh/known_hosts` and the global/system git config |
+| `--no-machine` | Skip `~/.ssh/config`, `~/.ssh/known_hosts`, the global/system git config and the GCM check |
 | `--format text\|json\|markdown` | Output format, default `text` |
 | `--fix` | Print the diff, ask `[y/N]`, back up each file to `<file>.bbhost-check-<unix-time>.bak`, then rewrite only the matched lines |
 | `--yes` | With `--fix`: skip the question |
 
-Exit codes: `0` nothing found, `1` findings left (use it as a CI check), `2` the tool could not check something (unreadable file, missing `ssh-keygen`, bad arguments).
+Exit codes: `0` nothing found, `1` findings left (use it as a CI check), `2` the tool could not check something (unreadable file, missing `ssh-keygen`, a GCM that does not report its version, bad arguments).
 
 ## What it scans
 
@@ -55,6 +57,7 @@ Exit codes: `0` nothing found, `1` findings left (use it as a CI check), `2` the
 | `~/.ssh/known_hosts` (plain or hashed) | has `bitbucket.org`, lacks `ssh.bitbucket.org` | appends `ssh.bitbucket.org` entries using the keys you already trust for `bitbucket.org` |
 | `bitbucket-pipelines.yml`, `.github/workflows/*.yml`, `.gitlab-ci.yml`, `Jenkinsfile*` | SSH URLs, `ssh-keyscan bitbucket.org` | rewrites the host |
 | `package.json`, `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock`, `pnpm-lock.yaml`, `Cargo.toml`, `Cargo.lock`, `go.mod`, `go.sum`, `Gemfile`, `Gemfile.lock`, `pyproject.toml`, `poetry.lock`, `uv.lock`, `requirements*.txt` | `git@bitbucket.org:`, `ssh://`, `git+ssh://` dependency URLs; npm `bitbucket:` shorthand | rewrites the host; the npm shorthand is reported for a manual change |
+| Credential helper (`git config` for `https://bitbucket.org`, plus the helper's `--version`) | GCM below 3.0.0, see below | nothing; reported with upgrade steps |
 
 Not a hit: `https://bitbucket.org/...` (with or without a user name), `ssh.bitbucket.org`, `altssh.bitbucket.org`, and `insteadOf = git@bitbucket.org:` lines (that is the two-line workaround, not a problem). `node_modules`, `target`, `.venv` and `venv` are skipped.
 
@@ -107,10 +110,34 @@ deploy	ssh://git@ssh.bitbucket.org:22/acme-demo/web-app-deploy.git (fetch)
 
 After rewriting a lockfile, run your package manager's install once so it re-checks the result.
 
+## GCM check (2026-11-30)
+
+Per the [Bitbucket Cloud changelog entry of 2026-10-13](https://developer.atlassian.com/cloud/bitbucket/changelog/), Bitbucket started enforcing rotating OAuth refresh tokens, which GCM supports from 3.0.0. From 2026-11-30, Git requests authenticated with OAuth 2.0 via GCM before 3.0.0 are blocked; until then affected users see a message after each `git push`. GCM signed in with an app password or API token (basic auth) is not affected.
+
+A finding is reported only when all of these hold:
+
+1. Some scanned repo config, `.gitmodules`, git config or dependency file uses `https://bitbucket.org` (an `insteadOf = https://bitbucket.org/` line that sends HTTPS to SSH does not count).
+2. The helper list git builds for `https://bitbucket.org` (from `git config --show-origin --get-regexp '^credential\..*helper$'`, generic and `credential.https://bitbucket.org.helper` entries, an empty value resets the list) contains GCM: `manager`, `manager-core`, or a path to `git-credential-manager[-core][.exe]`.
+3. `GCM_BITBUCKET_AUTHMODES` / `credential.bitbucketAuthModes` is unset or includes `oauth`.
+4. The helper is installed (`git credential-manager --version`, or `<path> --version` for a path) and reports a version below 3.0.0.
+
+It only runs `git config` and the helper's `--version`. It never asks for, reads or stores credentials. No GCM, a non-GCM helper (`osxkeychain`, `store`, `gh auth git-credential`), or no HTTPS use of Bitbucket means no report.
+
+Upgrading:
+
+| Platform | How |
+|---|---|
+| Windows | Git for Windows bundles GCM, but its latest release, 2.56.0.windows.3 (2026-10-22), still ships GCM 2.9.x, and the update to GCM 3.0.1 ([git-for-windows/git#6464](https://github.com/git-for-windows/git/issues/6464)) was still open on 2026-10-25. Bitbucket's changelog says the same. Until a new Git for Windows ships, install GCM 3.0.1+ on its own from the [GCM releases](https://github.com/git-ecosystem/git-credential-manager/releases): `gcmuser-win-x64-<version>.exe` (current user, no admin) or `gcm-win-x64-<version>.exe` (all users). GCM's docs warn that a standalone install overrides the bundled GCM even if a later Git for Windows bundles a newer one |
+| macOS | `brew upgrade --cask git-credential-manager`, or the `gcm-osx-<arch>-<version>.pkg` installer from the releases page |
+| Linux | `dotnet tool update -g git-credential-manager`, or the `.deb` / tarball from the releases page |
+
+See GCM's [install guide](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/install.md).
+
 ## Notes
 
 - Pipelines' default `known_hosts` now includes `ssh.bitbucket.org` ([BCLOUD-24132](https://jira.atlassian.com/browse/BCLOUD-24132), fixed). Bamboo needs 13.0.1, 12.1.12 or 10.2.24 or later for the new URL ([BAM-26573](https://jira.atlassian.com/browse/BAM-26573)).
 - If port 22 is blocked, Atlassian documents an alternate host and port ("Port 22 is blocked on local network"). `bbhost-check` leaves `altssh.bitbucket.org` alone; the announcement doesn't say whether it changes.
+- The GCM check does not tell OAuth and app-password sign-ins apart unless `credential.bitbucketAuthModes` says so, and it runs once per machine, not per repository config.
 - Not covered: ssh config `Include` files, scp URLs without a user name (`bitbucket.org:ws/repo`), Dockerfiles, Terraform and Ansible sources.
 - Background and design: [`docs/research.md`](docs/research.md), [`docs/design.md`](docs/design.md).
 
