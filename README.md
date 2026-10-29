@@ -10,6 +10,12 @@ A second Bitbucket deadline is covered too: per the [Bitbucket Cloud changelog (
 
 ## Install
 
+With Homebrew (macOS, Linux x86_64):
+
+```bash
+brew install majiayu000/tap/bbhost-check
+```
+
 Prebuilt binaries for Linux x86_64 (static, musl) and macOS (arm64, x86_64) are on the [Releases page](https://github.com/majiayu000/bbhost-check/releases), each with a `.sha256`. Swap `aarch64-apple-darwin` for `x86_64-apple-darwin` or `x86_64-unknown-linux-musl` as needed:
 
 ```bash
