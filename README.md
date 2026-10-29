@@ -10,10 +10,20 @@ A second Bitbucket deadline is covered too: per the [Bitbucket Cloud changelog (
 
 ## Install
 
-Build from source (Rust 1.88+):
+Prebuilt binaries for Linux x86_64 (static, musl) and macOS (arm64, x86_64) are on the [Releases page](https://github.com/majiayu000/bbhost-check/releases), each with a `.sha256`. Swap `aarch64-apple-darwin` for `x86_64-apple-darwin` or `x86_64-unknown-linux-musl` as needed:
 
 ```bash
-cargo install --git https://github.com/majiayu000/bbhost-check --locked
+curl -fsSLO https://github.com/majiayu000/bbhost-check/releases/latest/download/bbhost-check-aarch64-apple-darwin.tar.gz
+```
+
+```bash
+tar -xzf bbhost-check-aarch64-apple-darwin.tar.gz
+```
+
+Or from crates.io (Rust 1.88+):
+
+```bash
+cargo install bbhost-check
 ```
 
 ## Usage
