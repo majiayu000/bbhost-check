@@ -353,3 +353,45 @@ fn gcm_below_3_is_reported_only_when_used_for_bitbucket_https() {
     fs::create_dir(dir.path().join("code")).unwrap();
     assert!(gcm_findings(dir.path()).is_empty());
 }
+
+#[test]
+fn mixed_case_hosts_are_fixed_without_changing_paths_or_other_domains() {
+    let dir = tempfile::tempdir().unwrap();
+    let repo = dir.path().join("code/app/.git");
+    fs::create_dir_all(&repo).unwrap();
+    let config = repo.join("config");
+    let original = concat!(
+        "[remote \"origin\"]\n",
+        " url = git@BitBucket.org:Acme/应用.git\n",
+        " pushurl = ssh://git@BITBUCKET.ORG/Acme/App.git\n",
+        "[remote \"https\"]\n",
+        " url = https://BITBUCKET.ORG/Acme/App.git\n",
+        "[remote \"other\"]\n",
+        " url = git@BITBUCKET.ORG.example.com:Acme/App.git\n",
+        "[remote \"migrated\"]\n",
+        " url = git@SSH.BITBUCKET.ORG:Acme/App.git\n",
+    );
+    fs::write(&config, original).unwrap();
+    let scan = run(dir.path(), &["--no-machine", "--format", "json"], "");
+    assert_eq!(scan.status.code(), Some(1));
+    let json: Value = serde_json::from_slice(&scan.stdout).unwrap();
+    assert_eq!(json["findings"].as_array().unwrap().len(), 2);
+    let fixed = run(dir.path(), &["--no-machine", "--fix", "--yes"], "");
+    assert_eq!(fixed.status.code(), Some(0), "{:?}", fixed);
+    assert_eq!(
+        fs::read_to_string(&config).unwrap(),
+        original
+            .replace("git@BitBucket.org:", "git@ssh.BitBucket.org:")
+            .replace("git@BITBUCKET.ORG/", "git@ssh.BITBUCKET.ORG/")
+    );
+    let backup = fs::read_dir(&repo)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .find(|p| p.extension().is_some_and(|e| e == "bak"))
+        .unwrap();
+    assert_eq!(fs::read_to_string(backup).unwrap(), original);
+    let again = run(dir.path(), &["--no-machine", "--format", "json"], "");
+    assert_eq!(again.status.code(), Some(0));
+    let json: Value = serde_json::from_slice(&again.stdout).unwrap();
+    assert!(json["findings"].as_array().unwrap().is_empty());
+}
