@@ -106,15 +106,17 @@ fn token_before(line: &str, i: usize) -> &str {
 
 /// `true` if the line has an HTTPS URL for `bitbucket.org` (where a credential helper is used).
 pub fn has_https_bitbucket(line: &str) -> bool {
-    line.to_ascii_lowercase().match_indices(OLD_HOST).any(|(i, _)| {
-        let token = token_before(line, i).to_ascii_lowercase();
-        let next = line[i + OLD_HOST.len()..].chars().next();
-        (token.ends_with("//") || token.ends_with('@'))
-            && ["https://", "http://", "git+https://"]
-                .iter()
-                .any(|s| token.starts_with(s))
-            && next.is_none_or(|c| !is_host_char(c))
-    })
+    line.to_ascii_lowercase()
+        .match_indices(OLD_HOST)
+        .any(|(i, _)| {
+            let token = token_before(line, i).to_ascii_lowercase();
+            let next = line[i + OLD_HOST.len()..].chars().next();
+            (token.ends_with("//") || token.ends_with('@'))
+                && ["https://", "http://", "git+https://"]
+                    .iter()
+                    .any(|s| token.starts_with(s))
+                && next.is_none_or(|c| !is_host_char(c))
+        })
 }
 
 fn is_ssh_host_at(line: &str, i: usize) -> bool {
