@@ -65,7 +65,8 @@ fn rewrite_where(line: &str, mut matches: impl FnMut(usize) -> bool) -> Option<S
     let mut out = String::with_capacity(line.len() + 8);
     let mut last = 0;
     let mut hit = false;
-    for (i, _) in line.match_indices(OLD_HOST) {
+    // Hostnames are case-insensitive; ASCII lowercasing keeps byte offsets.
+    for (i, _) in line.to_ascii_lowercase().match_indices(OLD_HOST) {
         if matches(i) {
             out.push_str(&line[last..i]);
             out.push_str("ssh.");
@@ -105,7 +106,7 @@ fn token_before(line: &str, i: usize) -> &str {
 
 /// `true` if the line has an HTTPS URL for `bitbucket.org` (where a credential helper is used).
 pub fn has_https_bitbucket(line: &str) -> bool {
-    line.match_indices(OLD_HOST).any(|(i, _)| {
+    line.to_ascii_lowercase().match_indices(OLD_HOST).any(|(i, _)| {
         let token = token_before(line, i).to_ascii_lowercase();
         let next = line[i + OLD_HOST.len()..].chars().next();
         (token.ends_with("//") || token.ends_with('@'))
@@ -174,6 +175,20 @@ mod tests {
             rw("ssh -T git@bitbucket.org").unwrap(),
             "ssh -T git@ssh.bitbucket.org"
         );
+    }
+
+    #[test]
+    fn host_case_is_ignored() {
+        assert_eq!(
+            rw("ssh://git@BITBUCKET.ORG/acme/app.git").unwrap(),
+            "ssh://git@ssh.BITBUCKET.ORG/acme/app.git"
+        );
+        assert_eq!(
+            rw("git@BitBucket.org:acme/app.git").unwrap(),
+            "git@ssh.BitBucket.org:acme/app.git"
+        );
+        assert!(has_https_bitbucket("https://BITBUCKET.ORG/acme/app.git"));
+        assert_eq!(rw("git@BITBUCKET.ORG.example.com:acme/app.git"), None);
     }
 
     #[test]
