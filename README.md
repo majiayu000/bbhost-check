@@ -149,6 +149,12 @@ Upgrading:
 
 See GCM's [install guide](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/install.md).
 
+## Troubleshooting
+
+**`git@ssh.bitbucket.org: Permission denied (publickey).` right after switching a remote.** Your key is set in a `Host bitbucket.org` block of `~/.ssh/config`, so it no longer applies to `ssh.bitbucket.org` and ssh offers a different key. Several people hit this in the [announcement thread](https://community.atlassian.com/forums/Bitbucket-articles/Upcoming-change-to-Bitbucket-Cloud-SSH-access-move-from/ba-p/3234032). `bbhost-check` reports that block, and `--fix` changes it to `Host bitbucket.org ssh.bitbucket.org` so the same settings cover both names.
+
+**`Warning: Permanently added 'ssh.bitbucket.org' (ED25519) to the list of known hosts.`** This is expected the first time. The host keys did not change; only the name did. `bbhost-check --fix` adds the `ssh.bitbucket.org` entries to `known_hosts` up front, which CI jobs with `StrictHostKeyChecking=yes` need.
+
 ## Notes
 
 - Pipelines' default `known_hosts` now includes `ssh.bitbucket.org` ([BCLOUD-24132](https://jira.atlassian.com/browse/BCLOUD-24132), fixed). Bamboo needs 13.0.1, 12.1.12 or 10.2.24 or later for the new URL ([BAM-26573](https://jira.atlassian.com/browse/BAM-26573)).
