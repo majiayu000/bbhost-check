@@ -1,6 +1,6 @@
 [package]
 name = "bbhost-check"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.88"
 description = "Find Git-over-SSH uses of bitbucket.org (remotes, submodules, ~/.ssh/config, known_hosts, CI, lockfiles) and rewrite them to ssh.bitbucket.org before the Bitbucket Cloud SSH host change"
