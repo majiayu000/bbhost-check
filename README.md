@@ -1,6 +1,6 @@
 # bbhost-check
 
-**Bitbucket SSH migration check before the 2026-11-12 deadline:** one command finds every place on your machine that still uses `git@bitbucket.org` over SSH (remotes, submodules, `~/.ssh/config`, `known_hosts`, git config, CI files, lockfiles), shows the diff, and rewrites it to `git@ssh.bitbucket.org` after you confirm.
+**Bitbucket SSH migration check: brownouts start 2026-11-12, SSH to `bitbucket.org` ends 2026-12-10.** one command finds every place on your machine that still uses `git@bitbucket.org` over SSH (remotes, submodules, `~/.ssh/config`, `known_hosts`, git config, CI files, lockfiles), shows the diff, and rewrites it to `git@ssh.bitbucket.org` after you confirm.
 
 Per the [official Atlassian announcement](https://community.atlassian.com/forums/Bitbucket-articles/Upcoming-change-to-Bitbucket-Cloud-SSH-access-move-from/ba-p/3234032), Bitbucket Cloud is splitting traffic: `bitbucket.org` keeps HTTPS (web, API, `https://` clones) and all Git over SSH moves to `ssh.bitbucket.org`. Starting **2026-11-12**, SSH to `bitbucket.org` is blocked during scheduled brownout windows on working days, growing from 15 minutes to 3 hours, and on **2026-12-10** it is removed for good (per the announcement's October 21, 2026 update). The host keys stay the same. HTTPS URLs are not affected.
 
