@@ -84,7 +84,7 @@ pub fn markdown(report: &Report) -> String {
     let mut out = String::from("### Bitbucket SSH host migration\n\n");
     let _ = writeln!(
         out,
-        "Bitbucket Cloud is moving Git over SSH from `bitbucket.org` to `ssh.bitbucket.org`; SSH to `bitbucket.org` is refused starting 2026-11-12 ([official announcement]({ANNOUNCEMENT})). HTTPS URLs are not affected.\n"
+        "Bitbucket Cloud is moving Git over SSH from `bitbucket.org` to `ssh.bitbucket.org`; SSH to `bitbucket.org` is blocked during brownouts from 2026-11-12 and removed on 2026-12-10 ([official announcement]({ANNOUNCEMENT})). HTTPS URLs are not affected.\n"
     );
     if report.findings.is_empty() {
         let _ = writeln!(
