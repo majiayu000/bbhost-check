@@ -395,3 +395,60 @@ fn mixed_case_hosts_are_fixed_without_changing_paths_or_other_domains() {
     let json: Value = serde_json::from_slice(&again.stdout).unwrap();
     assert!(json["findings"].as_array().unwrap().is_empty());
 }
+
+/// Machine files symlinked into a dotfiles repo (stow, `ln -s`): `--fix` rewrites the
+/// link target and leaves the links in place.
+#[cfg(unix)]
+#[test]
+fn fix_writes_through_symlinked_dotfiles() {
+    use std::os::unix::fs::symlink;
+    let dir = sandbox();
+    let home = dir.path().join("home");
+    let dotfiles = dir.path().join("dotfiles");
+    fs::create_dir(&dotfiles).unwrap();
+    let gitconfig = dotfiles.join("gitconfig");
+    let ssh_config = dotfiles.join("ssh_config");
+    fs::rename(home.join(".gitconfig"), &gitconfig).unwrap();
+    fs::rename(home.join(".ssh/config"), &ssh_config).unwrap();
+    symlink(&gitconfig, home.join(".gitconfig")).unwrap();
+    // relative, the way stow links
+    symlink("../../dotfiles/ssh_config", home.join(".ssh/config")).unwrap();
+    let original = fs::read_to_string(&gitconfig).unwrap();
+
+    let out = run(dir.path(), &["--fix", "--yes"], "");
+    assert_eq!(out.status.code(), Some(1), "{out:?}");
+    for link in [home.join(".gitconfig"), home.join(".ssh/config")] {
+        let meta = fs::symlink_metadata(&link).unwrap();
+        assert!(
+            meta.file_type().is_symlink(),
+            "{} was replaced",
+            link.display()
+        );
+    }
+    assert!(
+        fs::read_to_string(&gitconfig)
+            .unwrap()
+            .contains("[url \"git@ssh.bitbucket.org:\"]")
+    );
+    assert!(
+        fs::read_to_string(&ssh_config)
+            .unwrap()
+            .contains("  HostName ssh.bitbucket.org\n")
+    );
+    let backup = fs::read_dir(&dotfiles)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .find(|p| {
+            p.file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("gitconfig.bbhost-check-")
+        })
+        .unwrap();
+    assert_eq!(fs::read_to_string(backup).unwrap(), original);
+    assert!(
+        !findings(dir.path())
+            .iter()
+            .any(|f| f.0.starts_with("home/"))
+    );
+}

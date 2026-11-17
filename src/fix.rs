@@ -96,6 +96,15 @@ fn rewrite(text: &str, fs: &[&Finding]) -> Result<String, String> {
 }
 
 fn apply_file(path: &Path, fs: &[&Finding], stamp: u64) -> Result<PathBuf, String> {
+    // A symlinked dotfile is rewritten where it lives: renaming onto the link would
+    // replace it with a plain file and leave the real config untouched.
+    let resolved;
+    let path = if fs::symlink_metadata(path).is_ok_and(|m| m.file_type().is_symlink()) {
+        resolved = fs::canonicalize(path).map_err(|e| e.to_string())?;
+        &resolved
+    } else {
+        path
+    };
     let text = read_text(path).map_err(|e| e.to_string())?;
     let new = rewrite(&text, fs)?;
     let name = path.file_name().ok_or("not a file")?.to_string_lossy();
